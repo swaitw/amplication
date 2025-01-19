@@ -1,18 +1,19 @@
 import React, { useCallback, useEffect } from "react";
 import { useHistory, useLocation, Link } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
-import { CircularProgress } from "@rmwc/circular-progress";
-import { Snackbar } from "@rmwc/snackbar";
-import "@rmwc/snackbar/styles";
-import "@rmwc/circular-progress/styles";
 import { setToken } from "../authentication/authentication";
 import { formatError } from "../util/error";
 import { Formik, Form } from "formik";
 import WelcomePage from "../Layout/WelcomePage";
-import { TextField } from "@amplication/design-system";
+import {
+  TextField,
+  Snackbar,
+  CircularProgress,
+} from "@amplication/ui/design-system";
 import { Button } from "../Components/Button";
 import { SIGN_IN_PAGE_CONTENT, DEFAULT_PAGE_SOURCE } from "../User/constants";
 import "./Signup.scss";
+import { LOCAL_STORAGE_KEY_INVITATION_TOKEN } from "../App";
 
 type Values = {
   email: string;
@@ -57,10 +58,14 @@ const Signup = () => {
 
   useEffect(() => {
     if (data) {
+      const isFromInvitation = localStorage.getItem(
+        LOCAL_STORAGE_KEY_INVITATION_TOKEN
+      );
       setToken(data.signup.token);
-      // @ts-ignore
-      const { from } = location.state || { from: { pathname: "/create-app" } };
-      history.replace(from);
+      history.push({
+        pathname: "/",
+        search: isFromInvitation ? "" : "complete-signup=1",
+      });
     }
   }, [data, history, location]);
 
@@ -113,11 +118,11 @@ const Signup = () => {
           />
 
           <Button type="submit">Continue</Button>
-          
+
           <p className={`${CLASS_NAME}__signup`}>
             Already have an account? <Link to="/login">Sign In</Link>
           </p>
-          {loading && <CircularProgress />}
+          {loading && <CircularProgress centerToParent />}
           <Snackbar open={Boolean(error)} message={errorMessage} />
         </Form>
       </Formik>

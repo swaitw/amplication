@@ -1,5 +1,4 @@
-import { SelectField, TextField } from "@amplication/design-system";
-import { Icon } from "@rmwc/icon";
+import { SelectField, TextField, Icon } from "@amplication/ui/design-system";
 import classNames from "classnames";
 import React, { useCallback } from "react";
 import { Draggable } from "react-beautiful-dnd";
@@ -11,7 +10,7 @@ import * as models from "../models";
 import { FieldIdentifier, CLASS_NAME, keyMap } from "./EntitiesDiagram";
 
 type Props = {
-  field: models.AppCreateWithEntitiesFieldInput;
+  field: models.ResourceCreateWithEntitiesFieldInput;
   entityIndex: number;
   fieldIndex: number;
   editedFieldIdentifier: FieldIdentifier | null;
@@ -58,22 +57,21 @@ export const EntitiesDiagramField = React.memo(
                   [`${CLASS_NAME}__fields__field--selected`]: selected,
                 },
                 {
-                  [`${CLASS_NAME}__fields__field--dragged`]: snapshot.isDragging,
+                  [`${CLASS_NAME}__fields__field--dragged`]:
+                    snapshot.isDragging,
                 }
               )}
               {...provided.dragHandleProps}
             >
               <Icon
-                icon={{
-                  icon: DATA_TYPE_TO_LABEL_AND_ICON[dataType].icon,
-                  size: "xsmall",
-                }}
+                icon={DATA_TYPE_TO_LABEL_AND_ICON[dataType].icon}
+                size="xsmall"
               />
               <span>{field.name}</span>
               <span className="spacer" />
               <Button
                 className={`${CLASS_NAME}__fields__field__edit`}
-                buttonStyle={EnumButtonStyle.Clear}
+                buttonStyle={EnumButtonStyle.Text}
                 type="button"
                 onClick={handleClick}
                 icon="edit_2"

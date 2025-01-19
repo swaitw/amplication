@@ -1,5 +1,9 @@
-import { EnumPanelStyle, Panel, TimeSince } from "@amplication/design-system";
-import { Icon } from "@rmwc/icon";
+import {
+  EnumPanelStyle,
+  Panel,
+  TimeSince,
+  Icon,
+} from "@amplication/ui/design-system";
 import { isEmpty } from "lodash";
 import React from "react";
 import classNames from "classnames";
@@ -11,7 +15,7 @@ import "./ApiTokenListItem.scss";
 const EXPIRATION_DAYS = 30;
 
 type Props = {
-  applicationId: string;
+  resourceId: string;
   apiToken: models.ApiToken;
   onDelete?: () => void;
   onError: (error: Error) => void;
@@ -20,7 +24,7 @@ type Props = {
 const CLASS_NAME = "api-token-list-item";
 
 export const ApiTokenListItem = ({
-  applicationId,
+  resourceId,
   apiToken,
   onDelete,
   onError,
@@ -47,7 +51,7 @@ export const ApiTokenListItem = ({
       panelStyle={EnumPanelStyle.Bordered}
     >
       <div className={`${CLASS_NAME}__panel-tag`}>
-        <Icon icon={{ icon: "key", size: "medium" }} />
+        <Icon icon="key" size="medium" />
       </div>
       <div className={`${CLASS_NAME}__panel-details`}>
         <div className={`${CLASS_NAME}__row`}>

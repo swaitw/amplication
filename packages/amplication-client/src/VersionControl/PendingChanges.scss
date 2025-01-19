@@ -2,9 +2,28 @@
 
 $empty-state-image-size: 120px;
 $counter-height: 18px;
+$resource-name-max-width: 180px;
 
 .pending-changes {
-  padding: var(--default-spacing);
+  padding: var(--large-spacing);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  @include scrollbars($default-scroll-width, var(--gray-30), transparent);
+
+  &__title {
+    @include bold-14;
+    margin: 0;
+    padding-bottom: var(--large-spacing);
+  }
+
+  &__divider {
+    border: none;
+    margin: auto 0 0 0;
+    background-color: var(--gray-70);
+    height: 1px;
+  }
 
   &__header {
     @include flexFullRowWithSpacing;
@@ -15,29 +34,27 @@ $counter-height: 18px;
 
   &__changes-header {
     @include flexFullRowWithSpacing;
-    @include body2;
+    @include regular-12;
+
+    :first-child {
+      color: var(--gray-base);
+    }
 
     :last-child {
       margin-left: 0;
     }
+
     .amp-button {
       margin-left: 0;
     }
-
-    .amp-icon {
-      font-size: 18px;
-    }
   }
 
-  &__changes-count {
-    background-color: var(--black10);
+  %__changes-count {
     height: $counter-height;
-    border-radius: $counter-height / 2;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    color: var(--black100);
     box-sizing: border-box;
     white-space: nowrap;
     width: auto;
@@ -45,12 +62,25 @@ $counter-height: 18px;
     min-width: $counter-height;
   }
 
+  &__changes-count-warning {
+    @extend %__changes-count;
+    color: var(--warning-default);
+  }
+
+  &__changes-count {
+    @extend %__changes-count;
+    background-color: var(--gray-80);
+    color: var(--gray-base);
+  }
+
   &__empty-state {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    img {
+
+    .svg-theme-image {
+      width: $empty-state-image-size;
       height: $empty-state-image-size;
     }
 
@@ -61,10 +91,14 @@ $counter-height: 18px;
     }
   }
 
-  &__changes {
-    margin-top: var(--default-spacing);
-    position: relative;
-    margin-bottom: var(--default-spacing);
+  &__changes-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: var(--default-spacing);
+    border: $border-dark;
+    padding: var(--default-spacing);
+    border-radius: var(--small-border-radius);
   }
 }
 

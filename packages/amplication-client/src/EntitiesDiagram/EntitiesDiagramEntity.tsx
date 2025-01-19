@@ -1,11 +1,10 @@
 import React, { useCallback } from "react";
-import { Icon } from "@rmwc/icon";
 import classNames from "classnames";
 import { FieldArray } from "formik";
 import { Droppable } from "react-beautiful-dnd";
 import { DraggableCore, DraggableData, DraggableEvent } from "react-draggable";
 import { HotKeys } from "react-hotkeys";
-import { TextField } from "@amplication/design-system";
+import { TextField, Icon } from "@amplication/ui/design-system";
 import { Button, EnumButtonStyle } from "../Components/Button";
 import * as models from "../models";
 import { DATA_TYPE_TO_LABEL_AND_ICON } from "../Entity/constants";
@@ -20,7 +19,7 @@ import { EntitiesDiagramField } from "./EntitiesDiagramField";
 import { EntitiesDiagramStaticField } from "./EntitiesDiagramStaticField";
 
 type Props = {
-  entity: models.AppCreateWithEntitiesEntityInput;
+  entity: models.ResourceCreateWithEntitiesEntityInput;
   entityIndex: number;
   editedFieldIdentifier: FieldIdentifier | null;
   editedEntity: number | null;
@@ -109,7 +108,7 @@ export const EntitiesDiagramEntity = React.memo(
                     {entityIndex > 0 && (
                       <Button
                         className={`${CLASS_NAME}__entities__entity__delete`}
-                        buttonStyle={EnumButtonStyle.Clear}
+                        buttonStyle={EnumButtonStyle.Text}
                         type="button"
                         onClick={handleDeleteEntity}
                         icon="trash_2"
@@ -117,7 +116,7 @@ export const EntitiesDiagramEntity = React.memo(
                     )}
                     <Button
                       className={`${CLASS_NAME}__entities__entity__edit`}
-                      buttonStyle={EnumButtonStyle.Clear}
+                      buttonStyle={EnumButtonStyle.Text}
                       type="button"
                       onClick={handleEditEntity}
                       icon="edit_2"
@@ -163,14 +162,13 @@ export const EntitiesDiagramEntity = React.memo(
                           )}
                         >
                           <Icon
-                            icon={{
-                              icon:
-                                DATA_TYPE_TO_LABEL_AND_ICON[
-                                  entity.fields[rubric.source.index].dataType ||
-                                    models.EnumDataType.SingleLineText
-                                ].icon,
-                              size: "xsmall",
-                            }}
+                            size="xsmall"
+                            icon={
+                              DATA_TYPE_TO_LABEL_AND_ICON[
+                                entity.fields[rubric.source.index].dataType ||
+                                  models.EnumDataType.SingleLineText
+                              ].icon
+                            }
                           />
                           <span>{entity.fields[rubric.source.index].name}</span>
                           <span className="spacer" />
@@ -183,7 +181,8 @@ export const EntitiesDiagramEntity = React.memo(
                         {...provided.droppableProps}
                         ref={provided.innerRef}
                         className={classNames(`${CLASS_NAME}__droppable`, {
-                          [`${CLASS_NAME}__droppable--over`]: snapshot.isDraggingOver,
+                          [`${CLASS_NAME}__droppable--over`]:
+                            snapshot.isDraggingOver,
                         })}
                       >
                         {entity.fields.map((field, fieldIndex) => (

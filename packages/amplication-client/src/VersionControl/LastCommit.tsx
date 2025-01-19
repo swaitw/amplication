@@ -1,74 +1,52 @@
-import React, { useMemo, useState, useContext } from "react";
-import { gql, useQuery } from "@apollo/client";
+import {
+  Button,
+  EnumButtonState,
+  EnumButtonStyle,
+  EnumFlexDirection,
+  EnumFlexItemMargin,
+  EnumGapSize,
+  EnumItemsAlign,
+  EnumTextColor,
+  EnumTextStyle,
+  FlexItem,
+  Text,
+} from "@amplication/ui/design-system";
 import classNames from "classnames";
-import { isEmpty } from "lodash";
-import { formatError } from "../util/error";
-import { CircularProgress } from "@rmwc/circular-progress";
-import * as models from "../models";
-import { UserAndTime } from "@amplication/design-system";
-import { Tooltip } from "@primer/components";
+import { formatDistanceToNow } from "date-fns";
+import { useContext } from "react";
+import { Link } from "react-router-dom";
 import { ClickableId } from "../Components/ClickableId";
-import BuildSummary from "./BuildSummary";
-import BuildHeader from "./BuildHeader";
-import PendingChangesContext from "./PendingChangesContext";
+import { AppContext } from "../context/appContext";
+import { Commit, EnumBuildStatus } from "../models";
+import { AnalyticsEventNames } from "../util/analytics-events.types";
+import { CommitBuildsStatusIcon } from "./CommitBuildsStatusIcon";
 import "./LastCommit.scss";
-
-type TData = {
-  commits: models.Commit[];
-};
+import { useCommitStatus } from "./hooks/useCommitStatus";
+import BuildGitLink from "./BuildGitLink";
+import { useProjectBaseUrl } from "../util/useProjectBaseUrl";
 
 type Props = {
-  applicationId: string;
+  lastCommit: Commit;
 };
 
 const CLASS_NAME = "last-commit";
 
-const LastCommit = ({ applicationId }: Props) => {
-  const pendingChangesContext = useContext(PendingChangesContext);
-  const [error, setError] = useState<Error>();
+const LastCommit = ({ lastCommit }: Props) => {
+  const { commitRunning } = useContext(AppContext);
+  const { baseUrl } = useProjectBaseUrl();
 
-  const { data, loading, error: errorLoading, refetch } = useQuery<TData>(
-    GET_LAST_COMMIT,
-    {
-      variables: {
-        applicationId,
-      },
-    }
-  );
-
-  React.useEffect(() => {
-    refetch();
-    return () => {
-      refetch();
-    };
-  }, [pendingChangesContext.isError, refetch]);
-
-  const lastCommit = useMemo(() => {
-    if (loading || isEmpty(data?.commits)) return null;
-    const [last] = data?.commits;
-    return last;
-  }, [loading, data]);
-
-  const build = useMemo(() => {
-    if (!lastCommit) return null;
-    const [last] = lastCommit.builds;
-    return last;
-  }, [lastCommit]);
-
-  const errorMessage =
-    formatError(errorLoading) || (error && formatError(error));
-
-  const account = lastCommit?.user?.account;
-
+  const { commitStatus, commitLastError } = useCommitStatus(lastCommit);
   if (!lastCommit) return null;
+
+  const singleBuild = lastCommit.builds && lastCommit.builds.length === 1;
 
   const ClickableCommitId = (
     <ClickableId
-      to={`/${build?.appId}/commits/${lastCommit.id}`}
+      to={`${baseUrl}/commits/${lastCommit.id}`}
       id={lastCommit.id}
-      label="Last commit"
+      label="Commit"
       eventData={{
-        eventName: "lastCommitIdClick",
+        eventName: AnalyticsEventNames.LastCommitIdClick,
       }}
     />
   );
@@ -76,129 +54,80 @@ const LastCommit = ({ applicationId }: Props) => {
   return (
     <div
       className={classNames(`${CLASS_NAME}`, {
-        [`${CLASS_NAME}__generating`]: pendingChangesContext.commitRunning,
+        [`${CLASS_NAME}__generating`]: commitRunning,
       })}
     >
-      {Boolean(error) && errorMessage}
-      {pendingChangesContext.commitRunning ? (
-        <div className={`${CLASS_NAME}__loading`}>
-          <CircularProgress /> Generating new build...
-        </div>
-      ) : (
-        <>
-          {isEmpty(lastCommit?.message) ? (
-            ClickableCommitId
-          ) : (
-            <Tooltip aria-label={lastCommit?.message} direction="ne">
-              {ClickableCommitId}
-            </Tooltip>
-          )}
-          <UserAndTime account={account} time={lastCommit.createdAt} />
+      <hr className={`${CLASS_NAME}__divider`} />
+      <div className={`${CLASS_NAME}__content`}>
+        <FlexItem
+          itemsAlign={EnumItemsAlign.Center}
+          end={<CommitBuildsStatusIcon commitBuildStatus={commitStatus} />}
+        >
+          <Text textStyle={EnumTextStyle.H4}>Last Commit</Text>
+        </FlexItem>
+        {commitLastError && (
+          <FlexItem
+            direction={EnumFlexDirection.Column}
+            margin={EnumFlexItemMargin.Top}
+          >
+            <Link to={`${baseUrl}/commits/${lastCommit.id}`}>
+              <Text
+                textStyle={EnumTextStyle.Tag}
+                textColor={EnumTextColor.ThemeRed}
+              >
+                {commitLastError}
+              </Text>{" "}
+              <Text
+                textStyle={EnumTextStyle.Tag}
+                textColor={EnumTextColor.White}
+                underline
+              >
+                View details
+              </Text>
+            </Link>
+          </FlexItem>
+        )}
+        <FlexItem
+          direction={EnumFlexDirection.Column}
+          margin={EnumFlexItemMargin.Both}
+          gap={EnumGapSize.Small}
+        >
+          {ClickableCommitId}
+          <Text textStyle={EnumTextStyle.Tag}>
+            {formatTimeToNow(lastCommit?.createdAt)}
+          </Text>
+        </FlexItem>
 
-          {build && (
-            <>
-              <BuildHeader
-                build={build}
-                isError={pendingChangesContext.isError}
-              />
-              <BuildSummary build={build} onError={setError} />
-            </>
-          )}
-        </>
-      )}
+        {singleBuild ? (
+          <BuildGitLink build={lastCommit.builds[0]} />
+        ) : (
+          <Link
+            to={`${baseUrl}/commits/${lastCommit.id}`}
+            className={`${CLASS_NAME}__view-code`}
+          >
+            <Button
+              buttonStyle={EnumButtonStyle.Outline}
+              disabled={
+                commitRunning || commitStatus === EnumBuildStatus.Running
+              }
+              buttonState={EnumButtonState.Success}
+            >
+              View code (multiple builds)
+            </Button>
+          </Link>
+        )}
+      </div>
     </div>
   );
 };
 
-export default LastCommit;
+function formatTimeToNow(time: Date | null): string | null {
+  return (
+    time &&
+    formatDistanceToNow(new Date(time), {
+      addSuffix: true,
+    })
+  );
+}
 
-export const GET_LAST_COMMIT = gql`
-  query lastCommit($applicationId: String!) {
-    commits(
-      where: { app: { id: $applicationId } }
-      orderBy: { createdAt: Desc }
-      take: 1
-    ) {
-      id
-      message
-      createdAt
-      user {
-        id
-        account {
-          firstName
-          lastName
-        }
-      }
-      changes {
-        resourceId
-        action
-        resourceType
-        versionNumber
-        resource {
-          __typename
-          ... on Entity {
-            id
-            displayName
-            updatedAt
-          }
-          ... on Block {
-            id
-            displayName
-            updatedAt
-          }
-        }
-      }
-      builds(orderBy: { createdAt: Desc }, take: 1) {
-        id
-        createdAt
-        appId
-        version
-        message
-        createdAt
-        commitId
-        actionId
-        action {
-          id
-          createdAt
-          steps {
-            id
-            name
-            createdAt
-            message
-            status
-            completedAt
-            logs {
-              id
-              createdAt
-              message
-              meta
-              level
-            }
-          }
-        }
-        createdBy {
-          id
-          account {
-            firstName
-            lastName
-          }
-        }
-        status
-        archiveURI
-        deployments(orderBy: { createdAt: Desc }, take: 1) {
-          id
-          buildId
-          createdAt
-          status
-          actionId
-          message
-          environment {
-            id
-            name
-            address
-          }
-        }
-      }
-    }
-  }
-`;
+export default LastCommit;

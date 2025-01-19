@@ -1,4 +1,5 @@
 import { createTeleporter } from "react-teleporter";
 
 export const HeaderToolbar = createTeleporter();
-export const MenuFixedPanel = createTeleporter();
+export const AsidePanel = createTeleporter();
+export const FilesPanel = createTeleporter();

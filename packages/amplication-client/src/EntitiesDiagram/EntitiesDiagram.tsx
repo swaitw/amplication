@@ -9,9 +9,9 @@ import { EntitiesDiagramRelations } from "./EntitiesDiagramRelations";
 import { EntitiesDiagramEntity } from "./EntitiesDiagramEntity";
 
 import { Button, EnumButtonStyle } from "../Components/Button";
-import { Snackbar } from "@rmwc/snackbar";
+import { Snackbar } from "@amplication/ui/design-system";
 
-export type EntitiesDiagramFormData = models.AppCreateWithEntitiesInput;
+export type EntitiesDiagramFormData = models.ResourceCreateWithEntitiesInput;
 
 export type EntityPositionData = {
   top: number;
@@ -29,7 +29,7 @@ export type FieldIdentifier = {
   fieldIndex: number;
 };
 
-export const COMMON_FIELDS: models.AppCreateWithEntitiesFieldInput[] = [
+export const COMMON_FIELDS: models.ResourceCreateWithEntitiesFieldInput[] = [
   {
     name: "ID",
     dataType: models.EnumDataType.Id,
@@ -125,12 +125,10 @@ export default function EntitiesDiagram() {
         return;
       }
 
-      const [sourceEntityIndex, sourceFieldIndex] = result.draggableId.split(
-        "_"
-      );
-      const [, destinationEntityIndex] = result.destination.droppableId.split(
-        "_"
-      );
+      const [sourceEntityIndex, sourceFieldIndex] =
+        result.draggableId.split("_");
+      const [, destinationEntityIndex] =
+        result.destination.droppableId.split("_");
       const destinationFieldIndex = result.destination.index;
 
       const sourceFields = values.entities[Number(sourceEntityIndex)].fields;
@@ -152,16 +150,15 @@ export default function EntitiesDiagram() {
     [values, setFieldValue, resetEditableElements]
   );
 
-  const [entitiesPosition, setEntitiesPosition] = useState<
-    EntitiesPositionData
-  >({
-    0: {
-      top: 0,
-      left: 0,
-      width: DEFAULT_ENTITY_WIDTH,
-      height: DEFAULT_ENTITY_HEIGHT,
-    },
-  });
+  const [entitiesPosition, setEntitiesPosition] =
+    useState<EntitiesPositionData>({
+      0: {
+        top: 0,
+        left: 0,
+        width: DEFAULT_ENTITY_WIDTH,
+        height: DEFAULT_ENTITY_HEIGHT,
+      },
+    });
 
   //used to force redraw the arrows (the internal lists of fields are not updated since it used  )
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
@@ -219,15 +216,14 @@ export default function EntitiesDiagram() {
         clonedEntities.splice(entityIndex, 1);
 
         clonedEntities.map((entity) => {
-          entity.relationsToEntityIndex = entity.relationsToEntityIndex?.flatMap(
-            (index) => {
+          entity.relationsToEntityIndex =
+            entity.relationsToEntityIndex?.flatMap((index) => {
               return index < entityIndex
                 ? [index]
                 : index === entityIndex
                 ? []
                 : [index - 1];
-            }
-          );
+            });
           return entity;
         });
 
@@ -309,22 +305,21 @@ export default function EntitiesDiagram() {
       <div className={`${CLASS_NAME}__toolbar`}>
         <Button
           className={`${CLASS_NAME}__toolbar__button`}
-          buttonStyle={EnumButtonStyle.Clear}
+          buttonStyle={EnumButtonStyle.Text}
           type="button"
           onClick={zoomIn}
           icon="zoom_in"
         />
         <Button
           className={`${CLASS_NAME}__toolbar__button`}
-          buttonStyle={EnumButtonStyle.Clear}
+          buttonStyle={EnumButtonStyle.Text}
           type="button"
           onClick={zoomOut}
           icon="zoom_out"
         />
-
         <Button
           className={`${CLASS_NAME}__toolbar__button`}
-          buttonStyle={EnumButtonStyle.Clear}
+          buttonStyle={EnumButtonStyle.Text}
           type="button"
           onClick={zoomReset}
           icon="maximize_2"

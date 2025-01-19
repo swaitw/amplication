@@ -1,13 +1,14 @@
 @import "../style/index.scss";
 
 $stripe-top-height: 120px;
-$stripe-top-height-small: 90px;
+$stripe-top-height-small: 45px;
 $stripe-side-width: 550px;
 $stripe-side-padding: 75px;
 $form-min-width: 550px;
 $form-mobile-max-width: 400px;
 $panel-min-width: 400px;
-$panel-padding: 64px 48px;
+$panel-padding: 24px 32px;
+$trial-message-padding: 16px 32px;
 $button-padding: 24px;
 
 $title-font-size: 30px;
@@ -27,7 +28,7 @@ $sub-title-font-size: 28px;
     box-sizing: border-box;
     height: $stripe-top-height-small;
 
-    background-color: var(--welcome-page-stripe-background);
+    background-color: var(--gray-full);
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -37,10 +38,11 @@ $sub-title-font-size: 28px;
 
     .discord-button {
       margin-top: calc(var(--large-spacing) * 2);
+      display: none;
     }
 
     &__logo {
-      margin-bottom: calc(var(--large-spacing) * 2);
+      // margin-bottom: calc(var(--large-spacing) * 2);
       img,
       svg {
         width: 150px;
@@ -69,7 +71,7 @@ $sub-title-font-size: 28px;
   }
 
   .open-source-message {
-    color: var(--black80);
+    color: var(--gray-20);
     line-height: 1.6;
 
     a {
@@ -90,16 +92,31 @@ $sub-title-font-size: 28px;
     max-width: $form-mobile-max-width;
 
     &__open-source-message {
+      padding: var(--double-spacing);
+      background-color: var(--panel-background);
+
+      display: block;
+
+      .open-source-message {
+        color: var(--gray-base);
+      }
+    }
+    .discord-button {
+      margin-top: calc(var(--large-spacing) * 2);
       display: block;
     }
   }
 
   &__panel {
-    //background-color: var(--welcome-page-stripe-background);
     box-sizing: border-box;
     text-align: center;
     padding: $panel-padding !important;
-    border: $border-black10;
+    border: $border-dark;
+    border-radius: 8px;
+    margin-left: var(--double-spacing);
+    margin-right: var(--double-spacing);
+    margin-bottom: var(--double-spacing);
+    background-color: var(--gray-90);
 
     label {
       text-align: left;
@@ -107,7 +124,6 @@ $sub-title-font-size: 28px;
 
     .amp-button {
       display: inline-block;
-      margin-top: $button-padding;
       width: 100%;
     }
   }
@@ -148,19 +164,25 @@ $sub-title-font-size: 28px;
       .open-source-message {
         display: block;
       }
+
+      .discord-button {
+        display: block;
+      }
     }
     &__form {
       min-width: $form-min-width;
       margin-top: auto;
-
-      &__open-source-message {
-        display: none;
-      }
     }
 
     &__panel {
       width: $panel-min-width;
       padding: $panel-padding !important;
+    }
+
+    &__trial-message {
+      width: $panel-min-width;
+      padding: $trial-message-padding;
+      margin-bottom: var(--default-spacing);
     }
   }
 }

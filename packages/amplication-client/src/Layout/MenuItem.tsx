@@ -2,9 +2,9 @@ import React, { ReactNode } from "react";
 import { useRouteMatch, NavLink } from "react-router-dom";
 import classNames from "classnames";
 import { Button, EnumButtonStyle } from "../Components/Button";
-import { Tooltip } from "@primer/components";
 
-import { Icon } from "@rmwc/icon";
+import { Icon, Tooltip } from "@amplication/ui/design-system";
+import "./MenuItem.scss";
 
 type Props = {
   /** Optional URL to navigate to on click  */
@@ -18,13 +18,14 @@ type Props = {
   /** Optional class name to be added to the element */
   className?: string;
   hideTooltip?: boolean;
+  disableHover?: boolean;
   children?: ReactNode;
   onClick?: () => void;
 };
 
 const NON_URL = "non-url";
 const DIRECTION = "e";
-const ICON_SIZE = "xlarge";
+const ICON_SIZE = "medium";
 
 /**
  *
@@ -38,27 +39,29 @@ const MenuItem = ({
   className,
   children,
   hideTooltip = false,
+  disableHover = false,
   onClick,
 }: Props) => {
   const match = useRouteMatch(to || NON_URL);
 
+  const [showTooltip, setShowTooltip] = React.useState(false);
+
+  const handleMouseEnter = React.useCallback(() => {
+    setShowTooltip(true);
+  }, []);
+
+  const handleMouseLeave = React.useCallback(() => {
+    setShowTooltip(false);
+  }, []);
+
   const content = (
     <Button
-      buttonStyle={EnumButtonStyle.Clear}
+      buttonStyle={EnumButtonStyle.Text}
       as={to ? NavLink : Button}
       onClick={onClick}
       to={to}
     >
-      {children ? (
-        children
-      ) : (
-        <Icon
-          icon={{
-            icon: icon,
-            size: ICON_SIZE,
-          }}
-        />
-      )}
+      {children ? children : <Icon icon={icon || ""} size={ICON_SIZE} />}
     </Button>
   );
 
@@ -66,9 +69,12 @@ const MenuItem = ({
     <div
       className={classNames("amp-menu-item", className, {
         "amp-menu-item--active": match !== null,
+        "amp-menu-item--no-hover": disableHover,
       })}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
-      {hideTooltip ? (
+      {hideTooltip || !showTooltip ? (
         content
       ) : (
         <Tooltip
